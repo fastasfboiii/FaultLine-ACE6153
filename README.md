@@ -1,4 +1,3 @@
-```markdown
 # FaultLine-ACE6153
 
 Simulation of **page replacement algorithms** for ACE6153 (Operating Systems) Assignment 2.
