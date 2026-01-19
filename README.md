@@ -117,7 +117,7 @@ FaultLine-ACE6153/
 
 ## Author
 
-Ahmed Yasser
-Rian Salem
+Ahmed Yasser,
+Rian Salem, and
 Yaquob
 
