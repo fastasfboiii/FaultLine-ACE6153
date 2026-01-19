@@ -1,6 +1,6 @@
 # FaultLine-ACE6153
 
-Simulation of **page replacement algorithms** for ACE6153 (Operating Systems) Assignment 2.
+Simulation of **page replacement algorithms** in python.
 
 This project models a **cache (page frames)** of fixed size and runs three classic replacement strategies:
 
