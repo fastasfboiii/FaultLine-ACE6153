@@ -36,7 +36,7 @@ Evicts the page that **has not been used for the longest time**.
 
 ### LFU — Least Frequently Used
 Evicts the page with the **lowest usage count** (fewest hits).  
-If there’s a tie, the code keeps the default tie behavior of Python’s `min()` on the current cache order.
+If there’s a tie, FIFO is used as a tie breaker.
 
 ---
 
