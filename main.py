@@ -35,7 +35,7 @@ def fifo(pages: list[int]) -> tuple[int, int]:
     Returns:
         tuple[int, int]
     '''
-    cache = ['_'] * CACHE_SIZE               
+    cache = ['_'] * CACHE_SIZE                # too lazy to add comments, fifo is simple lol
     next_replace = 0                        
     fault_count = 0
     hit_count = 0
@@ -78,24 +78,24 @@ def lru(pages: list[int]) -> tuple[int, int]:
     fault_count = 0
     hit_count = 0
 
-    for page in pages:                      
-        if page not in cache:               
-            fault_count += 1                 
+    for page in pages:         # iterate through each page request              
+        if page not in cache:          # if the page is not in the cache      
+            fault_count += 1       # increment fault count           
 
-            if len(cache) < CACHE_SIZE:      
-                cache.append(page)           
+            if len(cache) < CACHE_SIZE:       # if there is space in the cache
+                cache.append(page)           # add the new page
             else:                            
-                cache.pop(0)                
-                cache.append(page)           
+                cache.pop(0)            # else remove the least recently used page 
+                cache.append(page)     # add the new page         
 
         else:                                
-            hit_count += 1                   
-            cache.remove(page)               
-            cache.append(page)               
+            hit_count += 1          # increment hit count            
+            cache.remove(page)        # remove the page from its current position       
+            cache.append(page)             # add it to the most recently used position  
 
-        display_cache = cache.copy()
-        while len(display_cache) < CACHE_SIZE:
-            display_cache.append('-')
+        display_cache = cache.copy() # create a copy of the current cache state
+        while len(display_cache) < CACHE_SIZE: # fill the rest with '-' for displaying it in a nice way
+            display_cache.append('-') # add '-' to the end of the display cache
 
         sleep(0.5)                           
         print(f'Cache state: {display_cache}')
@@ -115,6 +115,8 @@ def lfu(pages: list[int], cache_size: int = 5) -> tuple[int, int]:
     4. If the page is already in the cache, increase its frequency count.
     5. it will count the faults and hits.
     6. Repeat for all pages in the input list.
+    
+    Note: in case of a tie in frequency, FIFO is used to break the tie.
 
     Args:
         pages (list[int]): A list of page requests.
@@ -123,40 +125,60 @@ def lfu(pages: list[int], cache_size: int = 5) -> tuple[int, int]:
         tuple[int, int]
     '''
 
+
     cache = ['-'] * cache_size
-    frequency = {}
+    frequency = {} 
+    loaded_time = {}    # for tie-breaking with FIFO
+    time = 0             
+
     faults = 0
     hits = 0
 
-    for page in pages:
-        if page in cache:
-            hits += 1
-            frequency[page] += 1
+    for page in pages:# iterate through each page request
+        time += 1         # increment time for each page request
+
+        if page in cache: # if the page is already in the cache
+            hits += 1        # increment hits
+            frequency[page] += 1  # increase its frequency count
         else:
-            faults += 1
+            faults += 1      # increment faults
 
-            if '-' in cache:
-                idx = cache.index('-')
-                cache[idx] = page
-                frequency[page] = 1
+            if '-' in cache: # if there is space in cache
+                idx = cache.index('-') # find the first empty slot
+                cache[idx] = page # add the new page
+                frequency[page] = 1 # initialize its frequency to 1 since it's newly added
+                loaded_time[page] = time      # record the time it was loaded for tie-breaking
             else:
-                min_freq = frequency[cache[0]]
-                index_of_out_page = 0
+                
+                min_freq = frequency[cache[0]]  # find the minimum frequency in the cache
+                for i in range(1, cache_size): # iterate through the cache
+                    if frequency[cache[i]] < min_freq: # if found a page with lower frequency
+                        min_freq = frequency[cache[i]] # update the minimum frequency
 
-                for i in range(1, cache_size):
-                    if frequency[cache[i]] < min_freq:
-                        min_freq = frequency[cache[i]]
-                        index_of_out_page = i
+                
+                index_of_out_page = 0 # index of the page to be removed is initialized to 0
+                for i in range(1, cache_size): # look for the least frequently used page
+                    if frequency[cache[i]] < frequency[cache[index_of_out_page]]: # if found a page with lower frequency
+                        index_of_out_page = i # update the index
+                    elif frequency[cache[i]] == frequency[cache[index_of_out_page]]: # if tie in frequency
+                        
+                        if loaded_time[cache[i]] < loaded_time[cache[index_of_out_page]]: # if page i was loaded earlier
+                            index_of_out_page = i # update the index
 
-                removed_page = cache[index_of_out_page]
-                cache[index_of_out_page] = page
+                removed_page = cache[index_of_out_page] # page to be removed from cache
 
-                frequency.pop(removed_page, None)
-                frequency[page] = 1
+                
+                frequency.pop(removed_page, None) # just pop it from frequency dict
+                loaded_time.pop(removed_page, None) # just pop it from loaded_time dict
+
+                
+                cache[index_of_out_page] = page # add the new page
+                frequency[page] = 1 # initialize its frequency to 1 since it's newly added
+                loaded_time[page] = time     # record the time it was loaded for tie-breaking
 
         print(f"Cache state: {cache}")
         sleep(0.5)
-              
+
     print("Total page faults:", faults)
     print("Total page hits:", hits)
     print("Page frequencies:", frequency)
