@@ -7,40 +7,9 @@ and LFU or least frequently used.
 
 Cache memory is simulated by a list.
 The size of the cache memory is defined in the variable 'cache_size'.
-It will be 5 for now.
+It will be 5.
 
-Eg. to to how this program works:
 input: 8, 2, 6, 4, 7, 8, 9, 2, 0, 1, 6, 4, 0, 8, 5
-
-FIFO output:
-Cache state: [8]
-Cache state: [8, 2]
-Cache state: [8, 2, 6]
-Cache state: [8, 2, 6, 4]
-Cache state: [8, 2, 6, 4, 7]
-Cache state: [2, 6, 4, 7, 8]
-Cache state: [6, 4, 7, 8, 9]
-ETC.
-
-LRU output:
-Cache state: [8]
-Cache state: [8, 2]
-Cache state: [8, 2, 6]
-Cache state: [8, 2, 6, 4]
-Cache state: [8, 2, 6, 4, 7]
-Cache state: [2, 6, 4, 7, 8]
-Cache state: [6, 4, 7, 8, 9]    
-ETC.
-
-LFU output:
-Cache state: [8]
-Cache state: [8, 2]
-Cache state: [8, 2, 6]
-Cache state: [8, 2, 6, 4]
-Cache state: [8, 2, 6, 4, 7]
-Cache state: [2, 6, 4, 7, 8]
-Cache state: [6, 4, 7, 8, 9]
-ETC.
 
 '''
 from time import sleep
@@ -172,15 +141,15 @@ def lfu(pages: list[int], cache_size: int = 5) -> tuple[int, int]:
                 frequency[page] = 1
             else:
                 min_freq = frequency[cache[0]]
-                victim_index = 0
+                index_of_out_page = 0
 
                 for i in range(1, cache_size):
                     if frequency[cache[i]] < min_freq:
                         min_freq = frequency[cache[i]]
-                        victim_index = i
+                        index_of_out_page = i
 
-                removed_page = cache[victim_index]
-                cache[victim_index] = page
+                removed_page = cache[index_of_out_page]
+                cache[index_of_out_page] = page
 
                 frequency.pop(removed_page, None)
                 frequency[page] = 1
